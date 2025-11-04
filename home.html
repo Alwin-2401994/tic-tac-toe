@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, violet, blue);
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+      margin: 20px auto;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: #fff;
+      border: 2px solid #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .cell:hover {
+      background-color: #f0f0f0;
+    }
+
+    .cell.taken {
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+
+    .player-inputs {
+      margin-bottom: 20px;
+    }
+
+    .player-inputs input {
+      margin: 5px;
+      padding: 5px;
+      font-size: 1rem;
+    }
+
+    .player-inputs button {
+      padding: 5px 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tic Tac Toe</h1>
+    <div class="player-inputs">
+      <input type="text" id="playerX" placeholder="Player X Name" />
+      <input type="text" id="playerO" placeholder="Player O Name" />
+      <button id="startGame">Start Game</button>
+    </div>
+    <div class="board" style="display: none;">
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+      <div class="cell" data-cell></div>
+    </div>
+  </div>
+  <script>
+    const cells = document.querySelectorAll('[data-cell]');
+    const board = document.querySelector('.board');
+    const startGameButton = document.getElementById('startGame');
+    const playerXInput = document.getElementById('playerX');
+    const playerOInput = document.getElementById('playerO');
+    let currentPlayer = 'X';
+    let playerXName = '';
+    let playerOName = '';
+
+    const winningCombinations = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6]
+    ];
+
+    function checkWin(currentClass) {
+      return winningCombinations.some(combination => {
+        return combination.every(index => {
+          return cells[index].textContent === currentClass;
+        });
+      });
+    }
+
+    function checkDraw() {
+      return [...cells].every(cell => {
+        return cell.textContent === 'X' || cell.textContent === 'O';
+      });
+    }
+
+    function handleClick(e) {
+      const cell = e.target;
+      if (cell.textContent !== '') return;
+
+      cell.textContent = currentPlayer;
+      cell.classList.add('taken');
+
+      if (checkWin(currentPlayer)) {
+        setTimeout(() => {
+          const winnerName = currentPlayer === 'X' ? playerXName : playerOName;
+          alert(`${winnerName} wins!`);
+          resetBoard();
+        }, 100);
+        return;
+      }
+
+      if (checkDraw()) {
+        setTimeout(() => {
+          alert('It\'s a draw!');
+          resetBoard();
+        }, 100);
+        return;
+      }
+
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    }
+
+    function resetBoard() {
+      cells.forEach(cell => {
+        cell.textContent = '';
+        cell.classList.remove('taken');
+      });
+      currentPlayer = 'X';
+    }
+
+    function startGame() {
+      playerXName = playerXInput.value || 'Player X';
+      playerOName = playerOInput.value || 'Player O';
+      board.style.display = 'grid';
+      document.querySelector('.player-inputs').style.display = 'none';
+    }
+
+    startGameButton.addEventListener('click', startGame);
+
+    cells.forEach(cell => {
+      cell.addEventListener('click', handleClick);
+    });
+  </script>
+</body>
+</html>
